@@ -1,0 +1,12 @@
+<Stage Name="Installation" Version="1.0">
+   <!-- The following step installs CPM on the server. This step dose not include creating the vault environment. 
+	     Specify the following parameters: Name, Company, InstallationDirectory-->
+   <Step Name="RunInstallation" DisplayName="Run the CPM Installation Script" ScriptName="RunInstallation.psm1"  Enable="Yes">
+      <Parameters>
+         <Parameter Name= "Username" Value="Windows User"/>
+         <Parameter Name= "Company" Value="My Company"/>
+         <Parameter Name= "CPMInstallDirectory" Value="C:\Program Files (x86)\CyberArk\"/>
+         <Parameter Name="isUpgrade" Value="false"/>
+      </Parameters>
+   </Step>
+</Stage>
