@@ -33,19 +33,12 @@ function Execute{
 			Copy-Item -Path "$ScriptRoot\vault12-0_template.iss" -Destination "$ScriptRoot\vault12-0.iss"
             $issFilePath = "$ScriptRoot\vault12-0.iss"
 			Add-CALogAll "installation is running in install mode"
-			Add-CALogAll "issfilepath = $issFilePath"
-			Add-CALogAll "setuppath = $setupPath"
-			Add-CALogAll "args = $Args"
-			Add-CALogAll "silentlog = $silentLog"
-			Add-CALogAll "additionalargs = $additionalArgs"
         }		
 		
 		try {
-			
-			
 			# Replace placeholders with values from the configuration xml file
 			#$additionalArgs = @( )	
-			#$result = Invoke-CASetupFile $issFilePath $setupPath $Args $silentLog $additionalArgs
+			$result = Invoke-CASetupFile $issFilePath $setupPath $Args $silentLog
 		}
 		catch{
 			Add-CALogErrorDetails $_.Exception
