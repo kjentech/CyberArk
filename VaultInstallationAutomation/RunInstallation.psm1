@@ -1,6 +1,6 @@
 # @FUNCTION@ ======================================================================================================================
 # Name...........: Execute
-# Description....: Installing CPM application
+# Description....: Installing Vault application
 # Parameters.....: None
 # Return Values..: None
 # =================================================================================================================================
@@ -12,36 +12,44 @@ function Execute{
 	)
 
 	Process{
-		Add-CALogAll "Start CPM installation"
+		Add-CALogAll "Start Vault installation"
 		Add-CALogAll "Args: $Args"
 		$ScriptRoot = (Get-Location).Path		
-		$setupPath = "$ScriptRoot\..\..\setup.exe"
-		$silentLog = "$ScriptRoot\cpm_silent.log"
+		$setupPath = "$ScriptRoot\..\setup.exe"
+		$silentLog = "$ScriptRoot\vault_silent.log"
 
-		$username = ($Args | Where Name -eq "Username").Value
-		$company = ($Args | Where Name -eq "Company").Value
-		$CPMInstallDirectory = ($Args | Where Name -eq "CPMInstallDirectory").Value
+		
+		
+		#define variables $Username, $Company, $VaultDestination, $SafesDestination, $LicensePath, $OperatorCDPath, $InstallRabbitMQ, $PerformHardening, $MasterPass, $AdminPass, $isUpgrade
+		$Args | foreach {New-Variable -Name $_.Name -Value $_.Value}
 
-		$isUpgradeVal =	($Args | Where Name -eq "isUpgrade").Value
-		if ($isUpgradeVal -eq "true")
+		if ($isUpgrade -eq "true")
         {
-            $issFilePath = "$ScriptRoot\silentUpdate.iss"
+            $issFilePath = "$ScriptRoot\vault12-0_upgrade.iss"
 			Add-CALogAll "installation is running in upgrade mode"
         }
         else
-        {		
-            $issFilePath = "$ScriptRoot\CPM_template.iss"
+        {	
+			Copy-Item -Path "$ScriptRoot\vault12-0_template.iss" -Destination "$ScriptRoot\vault12-0.iss"
+            $issFilePath = "$ScriptRoot\vault12-0.iss"
 			Add-CALogAll "installation is running in install mode"
+			Add-CALogAll "issfilepath = $issFilePath"
+			Add-CALogAll "setuppath = $setupPath"
+			Add-CALogAll "args = $Args"
+			Add-CALogAll "silentlog = $silentLog"
+			Add-CALogAll "additionalargs = $additionalArgs"
         }		
 		
 		try {
+			
+			
 			# Replace placeholders with values from the configuration xml file
-			$additionalArgs = @( $username, $company, $CPMInstallDirectory, "", "", "", "deploy")
-			$result = Invoke-CASetupFile $issFilePath $setupPath $Args $silentLog $additionalArgs
+			#$additionalArgs = @( )	
+			#$result = Invoke-CASetupFile $issFilePath $setupPath $Args $silentLog $additionalArgs
 		}
 		catch{
 			Add-CALogErrorDetails $_.Exception
-			Add-CALogAll "Failed installing CPM" "Error"
+			Add-CALogAll "Failed installing Vault" "Error"
 			$result = $false
 		}
 		return $result
