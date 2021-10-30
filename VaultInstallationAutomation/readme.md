@@ -28,7 +28,7 @@ To understand the modules better, we'll follow the flow.
 - Run `VaultInstallation.ps1` on your Vault server.
 
 
-# # Disclaimer and important reminders
+## Disclaimer and important reminders
 <u>**I AM NOT AFFILIATED WITH CYBERARK, I WILL TAKE NO RESPONSIBILITY FOR ANY LOSS OF DATA! CONSULT CYBERARK SUPPORT FOR GUIDANCE ON AUTOMATIC INSTALLATION AND UPGRADE OF THEIR PRODUCTS.**</u>
 
 I made this repo because I felt curious knowing that CyberArk published automation together with some installers but not all.
