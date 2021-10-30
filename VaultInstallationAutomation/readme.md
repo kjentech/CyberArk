@@ -1,4 +1,4 @@
-## CyberArk Digital Vault automated installation
+# CyberArk Digital Vault automated installation
 CyberArk provide PowerShell modules for installing and upgrading PAS components "PVWA", "CPM" and "PSM" automatically, but provides no official examples for Vault, the centerpiece of CyberArk PAS.
 
 All CyberArk PAS components (including Vault) are packaged by InstallShield, which provides its own answer file format, ISS([1](https://stackoverflow.com/questions/52092688/is-the-install-shield-silent-response-file-iss-file-login-user-rights-depende/52096995#52096995))([2](http://publib.boulder.ibm.com/tividd/td/framework/GC32-0804-00/en_US/HTML/instgu25.htm)).
@@ -28,7 +28,7 @@ To understand the modules better, we'll follow the flow.
 - Run `VaultInstallation.ps1` on your Vault server.
 
 
-## Disclaimer and important reminders
+# # Disclaimer and important reminders
 <u>**I AM NOT AFFILIATED WITH CYBERARK, I WILL TAKE NO RESPONSIBILITY FOR ANY LOSS OF DATA! CONSULT CYBERARK SUPPORT FOR GUIDANCE ON AUTOMATIC INSTALLATION AND UPGRADE OF THEIR PRODUCTS.**</u>
 
 I made this repo because I felt curious knowing that CyberArk published automation together with some installers but not all.
