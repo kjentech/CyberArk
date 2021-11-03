@@ -2,6 +2,8 @@ param (
     [string]$DomainName = "kaj.local"
 )
 
+## THIS IS A SCRATCHFILE FROM MY LAB
+
 
 $cred = Get-Credential -Message "$(get-date) CyberArk PowerShell"
 New-PASSession -Credential $cred -BaseURI "https://pvwa1.kaj.local"
