@@ -12,6 +12,7 @@ $MinSpecial = "1"
 ########### PACLI VARIABLES
 # set $UsePACLI = $false to skip all PACLI functions.
 # this script will then just edit the INI files placed in $tempPath, you can upload them to Vault yourself
+
 $UsePACLI = $true
 $PACLIPath = "C:\Install\Core Pas 12\PACLI-Rls-v12.0"
 $Vault = "LabVault"
@@ -21,7 +22,7 @@ $UserName = "administrator"
 $Password = "Cyberark1"
 $SafeName = "PasswordManagerShared"
 $FolderName = "Root\Policies"
-
+###########
 
 
 
