@@ -1,4 +1,10 @@
-﻿cd "C:\Install\Core Pas 12\Privileged Session Manager-Rls-v12.0\InstallationAutomation"
+<#
+References:
+https://docs.cyberark.com/Product-Doc/OnlineHelp/PAS/Latest/en/Content/PAS%20INST/PSM_AutomaticInstallation.htm#RunPSMinstallationinstages
+https://github.com/cyberark/psm/tree/master/tasks
+#>
+
+cd "C:\Install\Core Pas 12\Privileged Session Manager-Rls-v12.0\InstallationAutomation"
 
 # Prerequisites
 # først: edit PrerequisitesConfig.xml
