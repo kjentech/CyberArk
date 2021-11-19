@@ -5,6 +5,7 @@ $MinUpperCase = "4"
 $MinLowerCase = "3"
 $MinDigit = "2"
 $MinSpecial = "1"
+$PasswordForbiddenChars = @("´","``","'","^","~","i,"l","o","0")
 ###########
 
 
@@ -38,6 +39,8 @@ function editFile {
             $content = $content -replace "MinLowerCase=.*","MinLowerCase=$MinLowerCase"
             $content = $content -replace "MinDigit=.*","MinDigit=$MinDigit"
             $content = $content -replace "MinSpecial=.*","MinSpecial=$MinSpecial"
+            $content = $content -replace "PasswordForbiddenChars=.*","PasswordForbiddenChars=$($PasswordForbiddenChars -join ',')"
+            if (!($content -match "PasswordForbiddenChars")) {$content = $content -replace "MinSpecial=.*","MinSpecial=$MinSpecial`r`nPasswordForbiddenChars=$($PasswordForbiddenChars -join ',')"}
             Set-Content -Path $file -Value $content -Force -ErrorAction Stop
 
             Write-Verbose "[+] File $file has been SUCCESSFULLY modified" -Verbose
