@@ -5,7 +5,7 @@ $MinUpperCase = "4"
 $MinLowerCase = "3"
 $MinDigit = "2"
 $MinSpecial = "1"
-$PasswordForbiddenChars = @("´","``","'","^","~","i","l","o","0")
+$PasswordForbiddenChars = @("'",'´','`','^','~','i','l','o','0')
 ###########
 
 
