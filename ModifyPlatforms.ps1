@@ -1,11 +1,37 @@
 ########### PLATFORM VARIABLES
-$tempPath = "C:\Temp"
-$PasswordLength = "27"
-$MinUpperCase = "4"
-$MinLowerCase = "3"
-$MinDigit = "2"
-$MinSpecial = "1"
-$PasswordForbiddenChars = @("'",'´','`','^','~','i','l','o','0')
+$tempPath = "C:\Users\Administrator\OneDrive - Dubex A S\CyberArk\Policies"
+$props = [ordered]@{
+    ### Comman Tasks Parameters
+    #AllowedSafes = ".*"
+    #MinValidityPeriod = "60"
+
+    # Password Properties
+    PasswordLength = "27"
+    MinUpperCase = "4"
+    MinLowerCase = "3"
+    MinDigit = "2"
+    MinSpecial = "1"
+    PasswordForbiddenChars = @("'",'´','`','^','~','i','l','o','0')            # rule of thumb: use single-quotes, only double-quote when enclosing a single-quote
+
+    ### Change Task
+    AllowManualChange = "Yes"
+    PerformPeriodicChange = "No"
+    #HeadStartInterval = "5"
+    #FromHour = "-1"
+    #ToHour = "-1"
+
+    ### Verification Task
+    VFAllowManualVerification = "Yes"
+    VFPerformPeriodicVerification = "No"
+    #VFFromHour = "-1"
+    #VFToHour = "-1"
+
+    ### Reconciliation Task
+    RCAllowManualReconciliation = "Yes"
+    #RCAutomaticReconcileWhenUnsynched = "No"
+    #RCFromHour = "-1"
+    #RCToHour = "-1"
+}
 ###########
 
 
