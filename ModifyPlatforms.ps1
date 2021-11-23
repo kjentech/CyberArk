@@ -1,5 +1,5 @@
 ########### PLATFORM VARIABLES
-$tempPath = "C:\Users\Administrator\OneDrive - Dubex A S\CyberArk\Policies"
+$tempPath = "C:\Users\Administrator\Downloads\CyberArk\Policies"
 
 # uncomment the ones you want to edit/add
 $props = [ordered]@{
