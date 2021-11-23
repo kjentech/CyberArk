@@ -1,36 +1,71 @@
 ########### PLATFORM VARIABLES
 $tempPath = "C:\Users\Administrator\OneDrive - Dubex A S\CyberArk\Policies"
+
+# uncomment the ones you want to edit/add
 $props = [ordered]@{
-    ### Comman Tasks Parameters
+    ###### Comman Tasks Parameters
     #AllowedSafes = ".*"
-    #MinValidityPeriod = "60"
+    #MaxConcurrentConnections = "3"
 
-    # Password Properties
-    PasswordLength = "27"
-    MinUpperCase = "4"
-    MinLowerCase = "3"
-    MinDigit = "2"
-    MinSpecial = "1"
-    PasswordForbiddenChars = @("'",'´','`','^','~','i','l','o','0')            # rule of thumb: use single-quotes, only double-quote when enclosing a single-quote
+    #MinValidityPeriod = "60"                               # In minutes (-1 for none)
+    #ResetOveridesMinValidity = "Yes"
+    #ResetOveridesTimeFrame = "Yes"
+    #ImmediateInterval = "5"                                # In minutes
+    #Interval = "1440"                                      # In minutes
+    #UnrecoverableErrors = "2103,2105,2121"                 # one string, seperated by comma
+    
+    #MaximumRetries = "5"
+    #MinDelayBetweenRetries = "90"                          # In minutes
 
-    ### Change Task
-    AllowManualChange = "Yes"
-    PerformPeriodicChange = "No"
-    #HeadStartInterval = "5"
-    #FromHour = "-1"
-    #ToHour = "-1"
+    ###### Password Properties
+    PasswordLength                = "27"
+    MinUpperCase                  = "4"
+    MinLowerCase                  = "3"
+    MinDigit                      = "2"
+    MinSpecial                    = "1"
+    PasswordForbiddenChars        = @("'", '´', '`', '^', '~', 'i', 'l', 'o', '0')            # rule of thumb: use single-quotes, only double-quote when enclosing a single-quote
+    #PasswordEffectiveLength = "16"
 
-    ### Verification Task
-    VFAllowManualVerification = "Yes"
+    ###### Change Task
+    AllowManualChange             = "Yes"
+    PerformPeriodicChange         = "No"
+    #HeadStartInterval = "5"                                # In days (0 for none)
+    #ChangeNotificationPeriod = "-1"                        # Minimum number of seconds the change is delayed to allow application password provider synchronization. Use -1 or comment the parameter for no notification
+    #DaysNotifyPriorExpiration = "7"
+    #FromHour = "-1"                                        # Expected values: 0-23 or -1 for none
+    #ToHour = "-1"                                          # Expected values: 0-23 or -1 for none
+    #ExecutionDays = "Mon,Tue,Wed,Thu,Fri,Sat,Sun"          # one string, separated by comma
+
+    ###### Verification Task
+    VFAllowManualVerification     = "Yes"
     VFPerformPeriodicVerification = "No"
-    #VFFromHour = "-1"
-    #VFToHour = "-1"
+    #VFFromHour = "-1"                                        # Expected values: 0-23 or -1 for none
+    #VFToHour = "-1"                                          # Expected values: 0-23 or -1 for none
+    #VFExecutionDays = "Mon,Tue,Wed,Thu,Fri,Sat,Sun"          # one string, seperated by comma
 
-    ### Reconciliation Task
-    RCAllowManualReconciliation = "Yes"
+    ###### Reconciliation Task
+    RCAllowManualReconciliation   = "Yes"
     #RCAutomaticReconcileWhenUnsynched = "No"
-    #RCFromHour = "-1"
-    #RCToHour = "-1"
+    #RCReconcileReasons = "2114,2115,2106,2101"               # one string, Plug-in return codes separated by comma
+    #ReconcileAccountSafe = ""
+    #ReconcileAccountFolder = ""
+    #ReconcileAccountName = ""
+    #RCFromHour = "-1"                                        # Expected values: 0-23 or -1 for none
+    #RCToHour = "-1"                                          # Expected values: 0-23 or -1 for none
+    #RCExecutionDays = "Mon,Tue,Wed,Thu,Fri,Sat,Sun"          # one string, seperated by comma
+
+    ###### Notification settings
+    #NFNotifyPriorExpiration = "No"
+    #NFPriorExpirationRecipients = ""                        # One or more email addresses, separated by comma. Replaces default ENE recipient list.
+    #NFPriorExpirationFromHour = "0"                         # Expected values: 0-23 or -1 for none
+    #NFPriorExpirationToHour = "7"                           # Expected values: 0-23 or -1 for none
+    #NFPriorExpirationInterval = "60"                        # In minutes
+    
+    #NFNotifyOnPasswordDisable = "Yes"
+    #NFOnPasswordDisableRecipients = ""                      # One or more email addresses, separated by comma. Replaces default ENE recipient list.
+
+    #NFNotifyOnVerificationErrors = "Yes"
+    #NFOnVerificationErrorsRecipients = ""                   # One or more email addresses, separated by comma. Replaces default ENE recipient list.
 }
 ###########
 
@@ -60,17 +95,38 @@ function editFile {
         try {
             cd $tempPath
             $content = Get-Content $file
-            $content = $content -replace "PasswordLength=.*","PasswordLength=$PasswordLength"
-            $content = $content -replace "MinUpperCase=.*","MinUpperCase=$MinUpperCase"
-            $content = $content -replace "MinLowerCase=.*","MinLowerCase=$MinLowerCase"
-            $content = $content -replace "MinDigit=.*","MinDigit=$MinDigit"
-            $content = $content -replace "MinSpecial=.*","MinSpecial=$MinSpecial"
-            $content = $content -replace "PasswordForbiddenChars=.*","PasswordForbiddenChars=$($PasswordForbiddenChars -join ',')"
-            if (!($content -match "PasswordForbiddenChars")) {$content = $content -replace "MinSpecial=.*","MinSpecial=$MinSpecial`r`nPasswordForbiddenChars=$($PasswordForbiddenChars -join ',')"}
+            
+
+            # first filter - only get key-value pairs before a Section marker ( [...] )
+            $stop = $false
+            $content = foreach ($line in $content) {
+                if ($line -match "\[") { $stop = $true }
+                if ($stop -ne $true) {
+                    $line
+
+                    # enumerate igennem $props
+                    # foreach $key
+                    #   $line -replace "$key=.*", "$key=$value"
+                    # måske lav en spacer med flowerbox "New values from script"?
+                    # ;**************************************
+                    # ;New values automatically added from script
+                    # ;**************************************
+                }
+            }
+
+
+            $content = $content -replace "PasswordLength=.*", "PasswordLength=$PasswordLength"
+            $content = $content -replace "MinUpperCase=.*", "MinUpperCase=$MinUpperCase"
+            $content = $content -replace "MinLowerCase=.*", "MinLowerCase=$MinLowerCase"
+            $content = $content -replace "MinDigit=.*", "MinDigit=$MinDigit"
+            $content = $content -replace "MinSpecial=.*", "MinSpecial=$MinSpecial"
+            $content = $content -replace "PasswordForbiddenChars=.*", "PasswordForbiddenChars=$($PasswordForbiddenChars -join ',')"
+            if (!($content -match "PasswordForbiddenChars")) { $content = $content -replace "MinSpecial=.*", "MinSpecial=$MinSpecial`r`nPasswordForbiddenChars=$($PasswordForbiddenChars -join ',')" }
             Set-Content -Path $file -Value $content -Force -ErrorAction Stop
 
             Write-Verbose "[+] File $file has been SUCCESSFULLY modified" -Verbose
-        } catch {
+        }
+        catch {
             Write-Warning "[-] File $file FAILED to be modified"
             continue
         } #trycatch
@@ -83,7 +139,8 @@ function PACLIsetup {
     try {
         $ErrorActionPreference = "Stop"
         .\Pacli.exe init
-    } catch {}
+    }
+    catch {}
     $ErrorActionPreference = "SilentlyContinue"
     .\Pacli.exe define vault=$vault address=$vaultIP port=$VaultPort
     .\Pacli.exe default vault=$Vault user=$UserName
@@ -119,14 +176,16 @@ function PACLIdownload {
     foreach ($file in $selectedFiles) {
         try {
             $null = New-Item -ItemType Directory -Path $tempPath -ErrorAction SilentlyContinue
-        } catch {throw "Cannot create temp path"}
+        }
+        catch { throw "Cannot create temp path" }
 
         # download
         try {
             .\Pacli.exe retrievefile safe=PasswordManagerShared folder=Root\Policies file=$file localfolder=$tempPath localfile=$file
             $fileObject = Get-Item $tempPath\$file -ErrorAction Stop
             Write-Verbose "[+] File $file was SUCCESSFULLY retrieved from Vault" -Verbose
-        } catch {
+        }
+        catch {
             Write-Warning "[-] File $file FAILED to be retrieved from Vault"
             continue
         }# trycatch
@@ -141,7 +200,8 @@ function PACLIupload {
             .\Pacli.exe storefile safe=$SafeName folder=$FolderName file=$file localfolder=$tempPath localfile=($file.name)
             #Add-PVFile -safe "PasswordManagerShared" -folder "Root\Policies" -file $policy -localFolder $tempPath -localFile $file.name -ErrorAction Stop
             Write-Output "[+] File $file was SUCCESSFULLY modified and stored in the Vault `'$Vault`'"
-        } catch {
+        }
+        catch {
             Write-Warning "[-] File $file FAILED to be stored in the Vault"
         }
     }#foreach
@@ -159,6 +219,7 @@ if ($UsePACLI -eq $true) {
     PACLIdownload
     editFile
     PACLIupload
-} else {
+}
+else {
     editFile
 }
