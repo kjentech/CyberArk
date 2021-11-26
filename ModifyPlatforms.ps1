@@ -98,11 +98,19 @@ function editFile {
             
 
             # first filter - only get key-value pairs before a Section marker ( [...] )
+            
             $stop = $false
-            $content = foreach ($line in $content) {
+            foreach ($line in $content) {
                 if ($line -match "\[") { $stop = $true }
                 if ($stop -ne $true) {
-                    $line
+                    $m = $line.Split("=")[0]
+
+                    foreach ($key in $props.Keys) {
+                        if ($m -match $key) {
+                            $line -replace "$key=.*","$key=$($props[$key])"
+                        }
+                    }
+
 
                     # enumerate igennem $props
                     # foreach $key
@@ -113,6 +121,7 @@ function editFile {
                     # ;**************************************
                 }
             }
+            
 
 
             $content = $content -replace "PasswordLength=.*", "PasswordLength=$PasswordLength"
