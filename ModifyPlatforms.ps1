@@ -1,5 +1,5 @@
 ########### PLATFORM VARIABLES
-$tempPath = "C:\Users\Administrator\Downloads\CyberArk\Policies"
+$tempPath = "C:\Users\Administrator\OneDrive - Dubex A S\CyberArk\Policies"
 
 # uncomment the ones you want to edit/add
 $props = [ordered]@{
@@ -18,10 +18,10 @@ $props = [ordered]@{
     #MinDelayBetweenRetries = "90"                          # In minutes
 
     ###### Password Properties
-    PasswordLength                = "27"
-    MinUpperCase                  = "4"
-    MinLowerCase                  = "3"
-    MinDigit                      = "2"
+    PasswordLength                = "20"
+    MinUpperCase                  = "2"
+    MinLowerCase                  = "2"
+    MinDigit                      = "1"
     MinSpecial                    = "1"
     PasswordForbiddenChars        = @("'", '´', '`', '^', '~', 'i', 'l', 'o', '0')            # rule of thumb: use single-quotes, only double-quote when enclosing a single-quote
     #PasswordEffectiveLength = "16"
@@ -91,36 +91,60 @@ $FolderName = "Root\Policies"
 
 function editFile {
     foreach ($file in (dir $tempPath)) {
+        $contentList = [System.Collections.Generic.List[string]]::new()
+        $iniHashtable = [ordered]@{}
+
+
+
+
+        #$appendList = [System.Collections.Generic.List[string]]::new()
+        #$keylist = [System.Collections.Generic.List[string]]::new()
+
         # edit
-        try {
+        #try {
+            #$file = "Policy-P-WIN-DOM-15.ini"
             cd $tempPath
-            $content = Get-Content $file
+            Get-Content $file | foreach {$contentList.Add($_)}
             
 
             # first filter - only get key-value pairs before a Section marker ( [...] )
             
             $stop = $false
-            foreach ($line in $content) {
+            foreach ($line in $contentList) {
                 if ($line -match "\[") { $stop = $true }
                 if ($stop -ne $true) {
-                    $m = $line.Split("=")[0]
+                    $currentKey = $line.Split("=")[0]
+                    $currentValue = $line.Split("=")[1]
+                    $iniHashtable[$currentKey] = $currentValue
 
-                    foreach ($key in $props.Keys) {
-                        if ($m -match $key) {
-                            $line -replace "$key=.*","$key=$($props[$key])"
+                    foreach ($Targetkey in $props.Keys) {
+                        if ($currentKey -match $Targetkey) {
+                            #$appendList.add("$Targetkey=$($props[$Targetkey])")
+                            #$keylist.add($Targetkey)
+
+
+                            #$appendHashtable[$Targetkey] = ($props[$Targetkey])
+                            #$line -replace "$Targetkey=.*","$Targetkey=$($props[$Targetkey])"
                         }
                     }
 
 
-                    # enumerate igennem $props
-                    # foreach $key
-                    #   $line -replace "$key=.*", "$key=$value"
-                    # måske lav en spacer med flowerbox "New values from script"?
                     # ;**************************************
                     # ;New values automatically added from script
                     # ;**************************************
                 }
+            }#foreach
+
+
+            $props.keys | foreach {$iniHashtable.remove($_)}
+            [string[]]$b = $iniHashtable.keys |foreach {
+                "$_=$($iniHashtable[$_])"
             }
+
+
+
+            $content | Select-String -Pattern $appendList -notmatch
+            $content = $content -notlike "*$keylist*"
             
 
 
