@@ -91,31 +91,33 @@ $FolderName = "Root\Policies"
 
 function editFile {
     foreach ($file in (dir $tempPath)) {
-        $contentList = [System.Collections.Generic.List[string]]::new()
+
+        
+        #$contentList = [System.Collections.Generic.List[string]]::new()
         $iniHashtable = [ordered]@{}
-
-
-
-
-        #$appendList = [System.Collections.Generic.List[string]]::new()
-        #$keylist = [System.Collections.Generic.List[string]]::new()
 
         # edit
         #try {
             #$file = "Policy-P-WIN-DOM-15.ini"
             cd $tempPath
-            Get-Content $file | foreach {$contentList.Add($_)}
+            #Get-Content $file | foreach {$contentList.Add($_)}
+
+            $contentList = Get-Content $file | foreach {
+                 [PSCustomObject]@{
+                    Name = $_.Split("=")[0]
+                    Value = $_.Split("=")[1]
+                }
+            }
             
 
             # first filter - only get key-value pairs before a Section marker ( [...] )
             
             $stop = $false
             foreach ($line in $contentList) {
-                if ($line -match "\[") { $stop = $true }
+                if ($line.Name -match "\[") { $stop = $true }
                 if ($stop -ne $true) {
-                    $currentKey = $line.Split("=")[0]
-                    $currentValue = $line.Split("=")[1]
-                    $iniHashtable[$currentKey] = $currentValue
+                    $currentKeyValue = $line.Split("=")
+                    $iniHashtable[$currentKeyValue[0]] = $currentKeyValue[1]
 
                     foreach ($Targetkey in $props.Keys) {
                         if ($currentKey -match $Targetkey) {
@@ -136,10 +138,24 @@ function editFile {
             }#foreach
 
 
+            $iniHashtable.keys | where {$_ -match $contentlist}
+            $contentList | where {$_ -match $iniHashtable[$($_.split("=")[0])]}
+
+            $props.Keys | foreach {
+                
+                [PSCustomObject]@{
+                    Name = Value
+                }
+            }
+
             $props.keys | foreach {$iniHashtable.remove($_)}
-            [string[]]$b = $iniHashtable.keys |foreach {
+            [string[]]$b = $iniHashtable.keys | foreach {
                 "$_=$($iniHashtable[$_])"
             }
+
+            $b += ";**************************************"
+            $b += ";New values automatically added from script"
+            $b += ";**************************************"
 
 
 
