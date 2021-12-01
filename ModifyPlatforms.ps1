@@ -1,5 +1,5 @@
 ########### PLATFORM VARIABLES
-$tempPath = "C:\Temp"
+$tempPath = "C:\temp"
 
 # uncomment the ones you want to edit/add
 $props = [ordered]@{
@@ -94,7 +94,7 @@ function editFile {
         function Get-Ini {
             [CmdletBinding()]
             param (
-                [IO.FileInfo]$FilePath = $file,
+                [IO.FileInfo]$FilePath,
                 [switch]$IgnoreComments,
                 [string]$CommentChar = ";",
                 [string]$NoSection = "_"
@@ -170,19 +170,23 @@ function editFile {
         function Set-Ini {
             [CmdletBinding()]
             param (
+                [Parameter( Mandatory = $true, ValueFromPipeline = $true )]
+                $InputObject,
+
+                [Parameter( Mandatory = $true)]
                 [Hashtable]$NameValuePairs,
-                [string]$Sections = "_",
+
+                [string]$Sections = "_"
                 #$FilePath
 
-                [Parameter( Mandatory = $true, ValueFromPipeline = $true )]
-                [System.Collections.IDictionary]
-                $InputObject
+
             )
     
         
     
             begin {
-                $content = Get-Ini -FilePath $FilePath
+                #$content = Get-Ini -FilePath $FilePath
+                $content = $InputObject
     
                 Function Update-IniEntry {
                     param ($content, $section)
@@ -329,16 +333,18 @@ function editFile {
     
     
         }
+
+        cd $tempPath
     }
 
     process {
         foreach ($file in (dir $tempPath)) {
             try {
+                $inicontents = Get-Ini -FilePath $file
                 $stripped = Get-Ini -FilePath $file
                 $props.keys | foreach { $stripped["_"].remove($_) }
                 $c = $stripped["_"] + $props
-                $d = Get-Ini -FilePath $file | Set-Ini -NameValuePairs $c
-                $d | Out-Ini -FilePath "$($file.BaseName)-new.ini"
+                Set-Ini -NameValuePairs $c -InputObject $inicontents | Out-Ini -FilePath "$($file.BaseName)-new.ini"
 
                 Write-Verbose "[+] File $file has been SUCCESSFULLY modified" -Verbose
 
