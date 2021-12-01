@@ -1,5 +1,5 @@
 ########### PLATFORM VARIABLES
-$tempPath = "C:\Users\Administrator\OneDrive - Dubex A S\CyberArk\Policies"
+$tempPath = "C:\Temp"
 
 # uncomment the ones you want to edit/add
 $props = [ordered]@{
@@ -94,7 +94,7 @@ function editFile {
         function Get-Ini {
             [CmdletBinding()]
             param (
-                [IO.FileInfo]$FilePath = "$tempPath\$file",
+                [IO.FileInfo]$FilePath = $file,
                 [switch]$IgnoreComments,
                 [string]$CommentChar = ";",
                 [string]$NoSection = "_"
