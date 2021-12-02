@@ -1,5 +1,6 @@
 ########### PLATFORM VARIABLES
 $tempPath = "C:\temp"
+$VerbosePreference = "SilentlyContinue"
 
 # uncomment the ones you want to edit/add
 $props = [ordered]@{
@@ -99,7 +100,6 @@ function editFile {
                 [string]$CommentChar = ";",
                 [string]$NoSection = "_"
             )
-    
     
             $ini = New-Object System.Collections.Specialized.OrderedDictionary([System.StringComparer]::OrdinalIgnoreCase)
     
@@ -236,7 +236,7 @@ function editFile {
                 $InputObject,
     
                 [ValidateSet("Unicode", "UTF7", "UTF8", "ASCII", "BigEndianUnicode", "Byte", "String")]
-                [string]$Encoding = "UTF8",
+                [string]$Encoding = "ASCII",
     
                 [string]$NoSection = "_"
             )
@@ -254,7 +254,7 @@ function editFile {
     
                         [ValidateSet("Unicode", "UTF7", "UTF8", "ASCII", "BigEndianUnicode", "Byte", "String")]
                         [Parameter( Mandatory )]
-                        [string]$Encoding = "UTF8",
+                        [string]$Encoding = "ASCII",
     
                         $Delimiter = "=",
     
@@ -269,17 +269,16 @@ function editFile {
                         Foreach ($key in $InputObject.get_keys()) {
                             if ($key -match "^Comment\d+") {
                                 Write-Verbose "$($MyInvocation.MyCommand.Name):: Writing comment: $key"
-                                "$($InputObject[$key])" | Out-File -Encoding $Encoding -FilePath $FilePath -Append
+                                $toFile.Add("$($InputObject[$key])")
                             }
                             else {
                                 Write-Verbose "$($MyInvocation.MyCommand.Name):: Writing key: $key"
                                 $InputObject[$key] |
-                                ForEach-Object { "$key$delimiter$_" } |
-                                Out-File -Encoding $Encoding -FilePath $FilePath -Append
-                            }
-                        }
-                    }
-                }
+                                ForEach-Object { $toFile.Add("$key$delimiter$_") }
+                            }#ifelse
+                        }#foreach
+                    }#process
+                }#function Out-Keys
     
                 $Delimiter = "="
     
@@ -300,51 +299,54 @@ function editFile {
                     if (!($InputObject[$i].GetType().GetInterface('IDictionary'))) {
                         #Key value pair
                         Write-Verbose "$($MyInvocation.MyCommand.Name):: Writing key: $i"
-                        "$i$delimiter$($InputObject[$i])" | Out-File -Append @parameters
+                        $toFile.Add("$i$delimiter$($InputObject[$i])")
     
-                    }
+                    }#if
                     elseif ($i -eq $NoSection) {
                         #Key value pair of NoSection
                         Out-Keys $InputObject[$i] `
                             @parameters `
                             -Delimiter $delimiter `
                             -MyInvocation $MyInvocation
-                    }
+                    }#elseif
                     else {
                         #Sections
                         Write-Verbose "$($MyInvocation.MyCommand.Name):: Writing Section: [$i]"
     
                         # Only write section, if it is not a dummy ($script:NoSection)
-                        if ($i -ne $NoSection) { "$extraLF[$i]"  | Out-File -Append @parameters }
+                        if ($i -ne $NoSection) { $toFile.Add("$extraLF[$i]") }
     
                         if ( $InputObject[$i].Count) {
                             Out-Keys $InputObject[$i] `
                                 @parameters `
                                 -Delimiter $delimiter `
                                 -MyInvocation $MyInvocation
-                        }
-    
-                    }
-                }
-                Write-Verbose "$($MyInvocation.MyCommand.Name):: Finished Writing to file: $FilePath"
-    
-            }
-    
-    
-    
-        }
+                        }#if
+                    }#else
+                }#foreach
 
+
+                    # write file
+                    $Utf8NoBOMEncoding = New-Object System.Text.UTF8Encoding $false
+		            [IO.File]::WriteAllLines($FilePath, $toFile, $Utf8NoBOMEncoding)
+
+                    Write-Verbose "$($MyInvocation.MyCommand.Name):: Finished Writing to file: $FilePath"
+                }#process
+                
+        }# function Out-Ini
+
+        $toFile = [System.Collections.Generic.List[string]]::new()
         cd $tempPath
     }
 
     process {
-        foreach ($file in (dir $tempPath)) {
+        foreach ($file in (dir $tempPath\*.ini)) {
             try {
                 $inicontents = Get-Ini -FilePath $file
                 $stripped = Get-Ini -FilePath $file
                 $props.keys | foreach { $stripped["_"].remove($_) }
                 $c = $stripped["_"] + $props
-                Set-Ini -NameValuePairs $c -InputObject $inicontents | Out-Ini -FilePath "$($file.BaseName)-new.ini"
+                Set-Ini -NameValuePairs $c -InputObject $inicontents | Out-Ini -FilePath "C:\Temp\New\$($file.BaseName).ini"
 
                 Write-Verbose "[+] File $file has been SUCCESSFULLY modified" -Verbose
 
@@ -355,7 +357,7 @@ function editFile {
             } #trycatch
         }# foreach
     }# process
-}
+}#function EditFile
 
 function PACLIsetup {
     cd $PACLIPath
