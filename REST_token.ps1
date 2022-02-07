@@ -1,3 +1,5 @@
+ # REST Token test
+
  $domainName = "lab.local"
  $BaseURI = "https://pvwa1.lab.local"
  $UserName = "administrator"
