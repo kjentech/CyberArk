@@ -52,7 +52,7 @@ begin {
     function RecursiveDelete($theroot) {
         $children = Get-ChildItem -Path $theroot -Directory | Select-Object -ExpandProperty FullName
         foreach ($achild in $children) {
-            if ($achild -ne $null) {
+            if ($null -ne $achild) {
                 RecursiveDelete $achild
             }
         }
@@ -156,7 +156,7 @@ process {
 
 
     if ($RemoveOldPSMRecordings) {
-        $FoldersToRemove = Get-ChildItem -Path $PathRoot -Recurse -Directory | Where { $_.Name -eq "PSMRecordings" -and $_.FullName -notmatch $PathToday.Name }
+        $FoldersToRemove = Get-ChildItem -Path $PathRoot -Recurse -Directory | Where-Object { $_.Name -eq "PSMRecordings" -and $_.FullName -notmatch $PathToday.Name }
         if (Test-Path -Path "$PathToday\Data\PSMRecordings\root\*.avi" -PathType Leaf) {
             Write-Verbose "[+] Starting removal of old PSMRecordings safes" -Verbose
             RemoveFolders $FoldersToRemove
