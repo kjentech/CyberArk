@@ -49,33 +49,37 @@ param (
 
 
 begin {
-    function RecursiveDelete($theroot) {
-        $children = Get-ChildItem -Path $theroot -Directory | Select-Object -ExpandProperty FullName
-        foreach ($achild in $children) {
-            if ($null -ne $achild) {
-                RecursiveDelete $achild
-            }
-        }
-        Remove-Item $theroot -recurse -force -Verbose
-    }
-    
-    function RemoveFolders {
-        param(
+    function RecursivelyDelete {
+        [CmdletBinding()]
+        param (
+            [Parameter()]
             [System.IO.DirectoryInfo[]]$FoldersToRemove
         )
-        foreach ($Folder in $FoldersToRemove) {
-            $Result = "[+] Deletion of $($Folder.FullName) completed sucessfully"
-            #$FilesToRemove = Get-ChildItem $Folder.FullName -Directory
-            try {
-                RecursiveDelete $Folder.FullName
+    
+        # enumerate every folder in the list
+        foreach ($Directory in $FoldersToRemove) {
+            $Result = "[+] Deletion of $($Directory.FullName) completed sucessfully"
+    
+            # enumerate subfolders
+            $SubDirs = Get-ChildItem -Path $Directory -Directory
+            foreach ($dir in $SubDirs) {
+                try {
+                    RecursivelyDelete -FoldersToRemove $dir.FullName -ErrorAction Stop
+                }
+                catch {
+                    Write-Output "[-] $_"
+                    $Result = "[!] Deletion of $($dir.FullName) completed with errors"
+                }
+                
             }
-            catch {
-                Write-Output "[-] $_"
-                $Result = "[!] Deletion of $($File.FullName) completed with errors"
+        
+            foreach ($file in Get-ChildItem $Directory -File) {
+                Remove-Item $file.FullName -Force -Verbose
             }
+            Remove-Item $Directory -Force
             Write-Verbose $Result -Verbose
-        }#foreach FoldersToRemove
-    }
+        }  
+    }#RecursivelyDelete
 
 
     $Today = Get-Date
@@ -84,16 +88,10 @@ begin {
     Start-Transcript -Path "$PathRoot\$($Today.ToString($DateFormat)).log" -Append
 
 
-    if (!(Test-Path "$PathRoot\Vault.ini")) {
-        throw "[-] Vault.ini does not exist in $PathRoot. Please copy over Vault.ini and configure it before proceeding."
-    }
-
-    if (!(Test-Path "$PathRoot\tsparm.ini")) {
-        try {
-            Copy-Item -Path 'C:\Program Files (x86)\PrivateArk\Replicate\tsparm.ini' -Destination $PathRoot
-        }
-        catch {
-            throw "[-] tsparm.ini does not exist in $PathRoot and we cannot copy it from the installation path. Please copy over tsparm.ini before proceeding."
+    "Vault.ini", "tsparm.ini" | ForEach-Object {
+        if (!(Test-Path "$PathRoot\$_")) {
+            throw "[-] $_ does not exist in $PathRoot. Please copy the file over and configure it before proceeding."
+            Stop-Transcript -ErrorAction SilentlyContinue
         }
     }
 }
@@ -101,6 +99,13 @@ begin {
 
 
 process {
+    # remove old backups if specified
+    if ($RemoveOlderThan -gt 0) {
+        $DateToRemove = Get-Date ($Today.AddDays(-$RemoveOlderThan)) -Format $DateFormat
+        $FoldersToRemove = Get-ChildItem $PathRoot -Directory | Where-Object { $_.Name -le $DateToRemove }
+        RecursivelyDelete $FoldersToRemove
+    }
+
     # create folder structure, copy tsparm.ini
     try {
         $null = New-Item -ItemType Directory -Path "$PathToday\MetaData" -Force -ErrorAction Stop             # creates the entire folder structure
@@ -141,14 +146,6 @@ process {
         $Result = "[+] $(Get-Date -Format "yyyyMMdd-HHmmss") Replication completed successfully"
         if ($PAReplicateLog[-10..-1] -match ".+(E|W) ") { $Result = "[!] $(Get-Date -Format "yyyyMMdd-HHmmss") Replication completed with errors" }
         Write-Verbose $Result -Verbose
-
-
-        # remove old backups if specified
-        if ($RemoveOlderThan -gt 0) {
-            $DateToRemove = Get-Date ($Today.AddDays(-$RemoveOlderThan)) -Format $DateFormat
-            $FoldersToRemove = Get-ChildItem $PathRoot | Where-Object { $_.Name -le $DateToRemove }
-            RemoveFolders $FoldersToRemove
-        }
     }
     else {
         Write-Warning "[-] $(Get-Date -Format "yyyyMMdd-HHmmss") Replication failed, check $PathToday\PAReplicate.log for errors !!!" -Verbose
@@ -159,7 +156,7 @@ process {
         $FoldersToRemove = Get-ChildItem -Path $PathRoot -Recurse -Directory | Where-Object { $_.Name -eq "PSMRecordings" -and $_.FullName -notmatch $PathToday.Name }
         if (Test-Path -Path "$PathToday\Data\PSMRecordings\root\*.avi" -PathType Leaf) {
             Write-Verbose "[+] Starting removal of old PSMRecordings safes" -Verbose
-            RemoveFolders $FoldersToRemove
+            RecursivelyDelete $FoldersToRemove
         }
     }
 
