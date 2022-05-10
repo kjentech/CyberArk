@@ -156,7 +156,7 @@ process {
         $FoldersToRemove = Get-ChildItem -Path $PathRoot -Recurse -Directory | Where-Object { $_.Name -eq "PSMRecordings" -and $_.FullName -notmatch $PathToday.Name }
         if (Test-Path -Path "$PathToday\Data\PSMRecordings\root\*.avi" -PathType Leaf) {
             Write-Verbose "[+] Starting removal of old PSMRecordings safes" -Verbose
-            RecursivelyDelete $FoldersToRemove
+            RecursivelyDelete $FoldersToRemove.FullName
         }
     }
 
