@@ -103,7 +103,7 @@ process {
     if ($RemoveOlderThan -gt 0) {
         $DateToRemove = Get-Date ($Today.AddDays(-$RemoveOlderThan)) -Format $DateFormat
         $FoldersToRemove = Get-ChildItem $PathRoot -Directory | Where-Object { $_.Name -le $DateToRemove }
-        RecursivelyDelete $FoldersToRemove
+        RecursivelyDelete $FoldersToRemove.FullName
     }
 
     # create folder structure, copy tsparm.ini
@@ -156,7 +156,7 @@ process {
         $FoldersToRemove = Get-ChildItem -Path $PathRoot -Recurse -Directory | Where-Object { $_.Name -eq "PSMRecordings" -and $_.FullName -notmatch $PathToday.Name }
         if (Test-Path -Path "$PathToday\Data\PSMRecordings\root\*.avi" -PathType Leaf) {
             Write-Verbose "[+] Starting removal of old PSMRecordings safes" -Verbose
-            RecursivelyDelete $FoldersToRemove
+            RecursivelyDelete $FoldersToRemove.FullName
         }
     }
 
