@@ -103,7 +103,7 @@ process {
     if ($RemoveOlderThan -gt 0) {
         $DateToRemove = Get-Date ($Today.AddDays(-$RemoveOlderThan)) -Format $DateFormat
         $FoldersToRemove = Get-ChildItem $PathRoot -Directory | Where-Object { $_.Name -le $DateToRemove }
-        RecursivelyDelete $FoldersToRemove
+        RecursivelyDelete $FoldersToRemove.FullName
     }
 
     # create folder structure, copy tsparm.ini
