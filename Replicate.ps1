@@ -144,7 +144,7 @@ process {
     # if the replication process started and ended
     if ($PAReplicateLog[0..10] -match "PAREP013I" -and $PAReplicateLog[-10..-1] -match "PAREP022I") {
         $Result = "[+] $(Get-Date -Format "yyyyMMdd-HHmmss") Replication completed successfully"
-        if ($PAReplicateLog[-10..-1] -match ".+(E|W) ") { $Result = "[!] $(Get-Date -Format "yyyyMMdd-HHmmss") Replication completed with errors" }
+        if ($PAReplicateLog[-10..-1] -cmatch ".+(E|W) ") { $Result = "[!] $(Get-Date -Format "yyyyMMdd-HHmmss") Replication completed with errors" }
         Write-Verbose $Result -Verbose
     }
     else {
