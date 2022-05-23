@@ -51,7 +51,7 @@ function FilterLogs {
     }
 }
 
-$ITALog = "C:\Users\kaj\Downloads\italog (1).log"
-$Filter = "ITATS528E|ITATS319W" 
+$ITALog = "C:\Logs\italog.log"
+$Filter = "ITATS528E|ITATS319W|-77" 
 FilterLogs -LogPath $ITALog -Filter $Filter | Out-GridView -Wait -Title $env:COMPUTERNAME 
      
