@@ -1,0 +1,18 @@
+<Stage Name="Installation" Version="1.0">
+   <!-- The following step installs Digital Vault -->
+   <Step Name="RunInstallation" DisplayName="Run the Vault Installation Script" ScriptName="RunInstallation.psm1"  Enable="Yes">
+      <Parameters>
+         <Parameter Name= "Username" Value="TestUser"/>
+         <Parameter Name= "Company" Value="TestCompany"/>
+		 <Parameter Name= "VaultDestination" Value="C:\Program Files (x86)\PrivateArk"/>
+		 <Parameter Name= "SafesDestination" Value="C:\PrivateArk\Safes"/>
+		 <Parameter Name= "LicensePath" Value="C:\Install"/>
+		 <Parameter Name= "OperatorCDPath" Value="C:\Install\DemoOperatorKeys"/>
+		 <Parameter Name= "InstallRabbitMQ" Value="0"/> <!-- 0=no/1=yes -->
+		 <Parameter Name= "PerformHardening" Value="1"/> <!-- 0=no/1=yes -->
+		 <Parameter Name= "MasterPass" Value="Cyberark1"/>
+		 <Parameter Name= "AdminPass" Value="Cyberark1"/>
+         <Parameter Name="isUpgrade" Value="false"/>
+      </Parameters>
+   </Step>
+</Stage>
